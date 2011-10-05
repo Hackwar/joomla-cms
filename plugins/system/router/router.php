@@ -18,10 +18,19 @@ jimport('joomla.plugin.plugin');
  */
 class plgSystemRouter extends JPlugin
 {
+	/**
+	 * Cached menu to improve performance
+	 *
+	 * @var JMenu
+	 * @since 11.3
+	 */
+	static protected $menu = null;
+
 	function onAfterInitialise()
 	{
 		$app = JFactory::getApplication();
 		if($app->isSite()) {
+			self::$menu	= $app->getMenu();
 			$router = $app->getRouter();
 			$router->attachBuildRule(array('plgSystemRouter', 'processItemID'));
 			if(in_array('force_ssl', $app->getCfg('sef_rules', array()))) {
@@ -35,13 +44,13 @@ class plgSystemRouter extends JPlugin
 			$router->attachParseRule(array('plgSystemRouter', 'parseRAW'));
 		}
 	}
-	
+
 	function onRouterRules()
 	{
 		$this->loadLanguage();
 		return array('sef', 'force_ssl', 'sef_rewrite', 'sef_suffix', 'unicodeslugs');
 	}
-	
+
 	function onComponentRouterRules($router = false)
 	{
 		if(!$router) {
@@ -53,71 +62,64 @@ class plgSystemRouter extends JPlugin
 			$router->attachParseRule(array('plgSystemRouter', 'parseComponentSEF'));
 		}
 	}
-	
+
 	/**
-	 * Function to attach the correct ItemID to the URL 
+	 * Function to attach the correct ItemID to the URL
 	 * and do some general processing
-	 * 
+	 *
 	 * @param JRouter calling JRouter object
 	 * @param JURI URL to be processed
 	 */
 	public static function processItemID(&$router, &$uri)
 	{
-		// Set URI defaults
-		$app	= JFactory::getApplication();
-		$menu	= $app->getMenu();
-
 		// Get the itemid form the URI
 		$itemid = $uri->getVar('Itemid');
 
 		if(!$itemid && !$uri->getVar('option') && is_null($uri->getPath())) {
 			$uri->setQuery(array_merge($router->getVars(),$uri->getQuery(true)));
 		}
-		
+
 		if (!$uri->getVar('option')) {
-			if ($item = $menu->getItem($itemid)) {
+			if ($item = self::$menu->getItem($itemid)) {
 					$uri->setVar('option', $item->component);
 			}
 		}
 	}
 
 	/**
-	 * Function to build the SEF URL 
-	 * 
+	 * Function to build the SEF URL
+	 *
 	 * @param JRouter calling JRouter object
 	 * @param JURI URL to be processed
 	 */
 	public static function buildSEF(&$router, &$uri)
 	{
-		$app	= JFactory::getApplication();
-		$menu	= $app->getMenu();
-	
 		// Make sure any menu vars are used if no others are specified
 		if ($uri->getVar('Itemid') && count($uri->getQuery(true)) == 2) {
 
 			// Get the active menu item
 			$itemid = $uri->getVar('Itemid');
-			$item = $menu->getItem($itemid);
+			$item = self::$menu->getItem($itemid);
 
 			if ($item) {
 				$uri->setQuery($item->query);
 			}
 			$uri->setVar('Itemid', $itemid);
 		}
-		
+
 		$option = $uri->getVar('option');
 		if (!$option) {
 			return;
 		}
-		
+
 		$query = $uri->getQuery(true);
-		
+
 		/*
 		 * Build the component route
 		 */
 		$component	= preg_replace('/[^A-Z0-9_\.-]/i', '', $option);
 		$tmp		= '';
-		$function	= $app->getRouter()->getComponentRouter($component);
+		$function	= $router->getComponentRouter($component);
 		$parts		= call_user_func_array($function, array(&$query));
 
 		// encode the route segments
@@ -138,7 +140,7 @@ class plgSystemRouter extends JPlugin
 		 */
 		$built = false;
 		if (isset($query['Itemid']) && !empty($query['Itemid'])) {
-			$item = $menu->getItem($query['Itemid']);
+			$item = self::$menu->getItem($query['Itemid']);
 			if (is_object($item) && $query['option'] == $item->component) {
 				if (!$item->home || $item->language!='*') {
 					$tmp = !empty($tmp) ? $item->route.'/'.$tmp : $item->route;
@@ -150,7 +152,7 @@ class plgSystemRouter extends JPlugin
 		if (!$built) {
 			$tmp = 'component/'.substr($query['option'], 4).'/'.$tmp;
 		}
-		
+
 		if (!$router->getOptions('sef_rewrite', 0)) {
 			//Transform the route
 			$result = 'index.php/'.$result;
@@ -166,13 +168,13 @@ class plgSystemRouter extends JPlugin
 		//Set query again in the URI
 		$uri->setQuery($query);
 		$uri->setPath($tmp);
-				
+
 		if ($limitstart = $uri->getVar('limitstart')) {
 			$uri->setVar('start', (int) $limitstart);
 			$uri->delVar('limitstart');
 		}
 	}
-	
+
 	public static function forceSSL($router, $uri)
 	{
 		if (strtolower($uri->getScheme()) != 'https') {
@@ -182,7 +184,7 @@ class plgSystemRouter extends JPlugin
 		}
 		return array();
 	}
-	
+
 	public static function cleanupPath($router, $uri)
 	{
 		// Get the path
@@ -197,7 +199,7 @@ class plgSystemRouter extends JPlugin
 		//Set the route
 		$uri->setPath(trim($path , '/'));
 	}
-	
+
 	public static function parseSEF($router, $uri)
 	{
 		$app	= JFactory::getApplication();
@@ -211,7 +213,7 @@ class plgSystemRouter extends JPlugin
 		if (empty($route)) {
 			return true;
 		}
-		
+
 		/*
 		 * Parse the application route
 		 */
@@ -259,7 +261,6 @@ class plgSystemRouter extends JPlugin
 
 			// Handle component	route
 			$component = preg_replace('/[^A-Z0-9_\.-]/i', '', $uri->getVar('option'));
-			$router = JFactory::getApplication()->getRouter();
 			$function = $router->getComponentRouter($component, 'Parse');
 
 			if(is_string($function)) {
@@ -289,12 +290,12 @@ class plgSystemRouter extends JPlugin
 				}
 			}
 		**/
-		
+
 		JRequest::set($uri->getQuery(true));
 
 		return true;
 	}
-	
+
 	public static function parseRAW($router, $uri)
 	{
 		$vars	= array();
@@ -308,7 +309,7 @@ class plgSystemRouter extends JPlugin
 				// No default item set
 				return true;
 			}
-			$uri->setVar('Itemid', $item->id);		
+			$uri->setVar('Itemid', $item->id);
 		} else {
 			$item = $menu->getItem($uri->getVar('Itemid'));
 		}
@@ -321,7 +322,7 @@ class plgSystemRouter extends JPlugin
 
 		return true;
 	}
-	
+
 	/**
 	 * Encode route segments
 	 *
@@ -353,7 +354,7 @@ class plgSystemRouter extends JPlugin
 
 		return $segments;
 	}
-	
+
 	public static function buildComponentSEF($crouter, $query, $segments)
 	{
 		if(!isset($query['Itemid'])) {
@@ -367,11 +368,10 @@ class plgSystemRouter extends JPlugin
 			unset($query['ts']);
 			return;
 		}
-		$menu = JFactory::getApplication()->getMenu();
-		$item = $menu->getItem($query['Itemid']);
-		
+		$item = self::$menu->getItem($query['Itemid']);
+
 		$views = $crouter->getViews();
-		
+
 		if(isset($item->query['view']) && $item->query['view'] == $query['view']) {
 			$view = $views[$query['view']];
 			if(isset($item->query[$view->id]) && $item->query[$view->id] == (int) $query[$view->id]) {
@@ -386,8 +386,8 @@ class plgSystemRouter extends JPlugin
 				unset($query['layout']);
 				return array();
 			}
-		} 
-		
+		}
+
 		$path = array_reverse($crouter->getPath($query));
 		$found = false;
 		$found2 = true;
@@ -408,7 +408,7 @@ class plgSystemRouter extends JPlugin
 					}
 				} else {
 					if(is_bool($ids)) {
-						$segments[] = $views[$view]->title; 
+						$segments[] = $views[$view]->title;
 					} else {
 						$segments[] = $ids[0];
 					}
@@ -436,8 +436,8 @@ class plgSystemRouter extends JPlugin
 		unset($query['ts']);
 		unset($query[$views[$view]->id]);
 		return;
-	}	
-	
+	}
+
 	public static function parseComponentSEF($router, $segments, $vars)
 	{
 		$views = $router->getViews();
@@ -483,7 +483,7 @@ class plgSystemRouter extends JPlugin
 						$vars[$view->parent_id] = $vars[$view->parent->id];
 					}
 					$vars[$view->id] = $id;
-					
+
 				} elseif($view->title == $segment) {
 					$vars['view'] = $view->name;
 					$found = true;
@@ -500,7 +500,7 @@ class plgSystemRouter extends JPlugin
 				$nestable = false;
 			} else {
 				break;
-			}			
+			}
 		}
 	}
 }

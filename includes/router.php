@@ -20,57 +20,57 @@ defined('JPATH_BASE') or die;
 class JRouterSite extends JRouter
 {
 	protected $componentRouters = array();
-	
+
 	protected $routerMethod;
-	
+
 	protected $routerClass;
 
 	public function getComponentRouter($component, $functionName = 'build')
 	{
-		if(isset($this->componentRouters[$component])) {
-			if(is_object($this->componentRouters[$component])) {
-				return array($this->componentRouters[$component], $functionName);
-			} elseif(is_string($this->componentRouters[$component])) {
-				return $this->componentRouters[$component].$functionName.'Route';
-			} else {
-				return 'JRouterDummyRouter';
-			}
-		}
-		$compname = ucfirst(substr($component, 4));
-		if(!class_exists($compname.'Router')) {
-			// Use the component routing handler if it exists
-			$path = JPATH_SITE.'/components/'.$component.'/router.php';
+		if(!isset($this->componentRouters[$component])) {
+			$compname = ucfirst(substr($component, 4));
+			if(!class_exists($compname.'Router')) {
+				// Use the component routing handler if it exists
+				$path = JPATH_SITE.'/components/'.$component.'/router.php';
 
-			// Use the custom routing handler if it exists
-			if (file_exists($path)) {
-				require_once $path;
-				if(!class_exists($compname.'Router')) {
-					$this->componentRouters[$component] = $compname; 
+				// Use the custom routing handler if it exists
+				if (file_exists($path)) {
+					require_once $path;
 				}
+			}
+			$name = $compname.'Router';
+			if(class_exists($name) && is_subclass_of($name, 'JComponentRouter')) {
+				// Component uses a routing class
+				$this->componentRouters[$component] = new $name();
+			} elseif (function_exists($compname.'BuildRoute') && function_exists($compname.'ParseRoute')) {
+				// Component uses routing functions
+				$this->componentRouters[$component] = $compname;
 			} else {
-				$this->componentRouters[$component] = false;
+				// Component doesn't have a routing handler
+				$this->componentRouters[$component] = 'JDefault';
 			}
 		}
-		if(class_exists($compname.'Router')) {
-			$name = $compname.'Router';
-			$this->componentRouters[$component] = new $name();
-		}
-		if(is_object($this->componentRouters[$component])) {
-			return array($this->componentRouters[$component], $functionName);
-		} elseif(is_string($this->componentRouters[$component])) {
+
+		// Return routing handler
+		if(is_string($this->componentRouters[$component])) {
+			// Legacy or default handler
 			return $this->componentRouters[$component].$functionName.'Route';
-		} else {
-			return 'JRouterDummyRouter';
 		}
+		return array($this->componentRouters[$component], $functionName);
 	}
-	
+
 	public function setComponentRouter($component, $router)
 	{
 		$this->componentRouters[$component] = $router;
 	}
 }
 
-function JRouterDummyRouter(&$query)
+function JDefaultBuildRoute(&$query)
+{
+	return array();
+}
+
+function JDefaultParseRoute($segments)
 {
 	return array();
 }
