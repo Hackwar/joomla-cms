@@ -1,14 +1,10 @@
 <?php
 /**
- * @version		$Id$
  * @copyright	Copyright (C) 2005 - 2011 Open Source Matters, Inc. All rights reserved.
  * @license		GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// no direct access
 defined('_JEXEC') or die;
-
-jimport('joomla.plugin.plugin');
 
 /**
  * Joomla! System Router Plugin
@@ -22,22 +18,24 @@ class plgSystemRouter extends JPlugin
 	 * Cached menu to improve performance
 	 *
 	 * @var JMenu
-	 * @since 11.3
+	 * @since 3.0
 	 */
 	static protected $menu = null;
 
 	function onAfterInitialise()
 	{
 		$app = JFactory::getApplication();
-		if($app->isSite()) {
+		if ($app->isSite()) {
 			self::$menu	= $app->getMenu();
 			$router = $app->getRouter();
 			$router->attachBuildRule(array('plgSystemRouter', 'processItemID'));
-			if(in_array('force_ssl', $app->getCfg('sef_rules', array()))) {
+
+			if (in_array('force_ssl', $app->getCfg('sef_rules', array()))) {
 				$router->attachParseRule(array('plgSystemRouter', 'forceSSL'));
 			}
 			$router->attachParseRule(array('plgSystemRouter', 'cleanupPath'));
-			if(in_array('sef', $app->getCfg('sef_rules', array()))) {
+
+			if (in_array('sef', $app->getCfg('sef_rules', array()))) {
 				$router->attachBuildRule(array('plgSystemRouter', 'buildSEF'));
 				$router->attachParseRule(array('plgSystemRouter', 'parseSEF'));
 			}
@@ -53,11 +51,11 @@ class plgSystemRouter extends JPlugin
 
 	function onComponentRouterRules($router = false)
 	{
-		if(!$router) {
+		if (!$router) {
 			return array('joomla');
 		}
 		$cfg = JFactory::getApplication()->getCfg('sef_component_rules', array());
-		if(in_array('joomla', $cfg)) {
+		if (in_array('joomla', $cfg)) {
 			$router->attachBuildRule(array('plgSystemRouter', 'buildComponentSEF'));
 			$router->attachParseRule(array('plgSystemRouter', 'parseComponentSEF'));
 		}
@@ -75,7 +73,7 @@ class plgSystemRouter extends JPlugin
 		// Get the itemid form the URI
 		$itemid = $uri->getVar('Itemid');
 
-		if(!$itemid && !$uri->getVar('option') && is_null($uri->getPath())) {
+		if (!$itemid && !$uri->getVar('option') && is_null($uri->getPath())) {
 			$uri->setQuery(array_merge($router->getVars(),$uri->getQuery(true)));
 		}
 
@@ -323,7 +321,7 @@ class plgSystemRouter extends JPlugin
 	public static function buildComponentSEF(JComponentRouter $crouter, &$query, &$segments)
 	{
         //Create the URL when no Itemid has been found
-		if(!isset($query['Itemid'])) {
+		if (!isset($query['Itemid'])) {
 			$segments[] = $query['view'];
 			$views = $crouter->getViews();
 			if(isset($views[$query['view']]->id)) {
@@ -342,12 +340,13 @@ class plgSystemRouter extends JPlugin
         $views = $crouter->getViews();
 
         //Return directly when the URL of the Itemid is identical with the URL to build
-		if(isset($item->query['view']) && $item->query['view'] == $query['view']) {
+		if (isset($item->query['view']) && $item->query['view'] == $query['view']) {
 			$view = $views[$query['view']];
-			if(isset($item->query[$view->id]) && $item->query[$view->id] == (int) $query[$view->id]) {
+			if (isset($item->query[$view->id]) && $item->query[$view->id] == (int) $query[$view->id]) {
 				unset($query[$view->id]);
 				$view = $view->parent;
-				while($view) {
+				while ($view)
+				{
 					unset($query[$view->child_id]);
 					$view = $view->parent;
 				}
@@ -359,17 +358,19 @@ class plgSystemRouter extends JPlugin
 		}
 
         //get the path from the view of the current URL and parse it to the menu item
-		$path = array_reverse($crouter->getPath($query));//var_dump($path);
+		$path = array_reverse($crouter->getPath($query));
 		$found = false;
 		$found2 = true;
-		for($i = 0, $j = count($path); $i < $j; $i++) {
+		for ($i = 0, $j = count($path); $i < $j; $i++)
+		{
 			reset($path);
 			$view = key($path);
 			if($found) {
 				$ids = array_shift($path);//var_dump($ids, $views[$view]);
-				if($views[$view]->nestable) {
-					foreach(array_reverse($ids) as $id) {
-						if($found2) {
+				if ($views[$view]->nestable) {
+					foreach (array_reverse($ids) as $id)
+					{
+						if ($found2) {
 							$segments[] = $id;
 						} else {
 							if($item->query[$views[$view]->id] == (int) $id) {
@@ -378,17 +379,17 @@ class plgSystemRouter extends JPlugin
 						}
 					}
 				} else {
-					if(is_bool($ids)) {
+					if (is_bool($ids)) {
 						$segments[] = $views[$view]->title;
 					} else {
 						$segments[] = $ids[0];
 					}
 				}
 			} else {
-				if($item->query['view'] != $view) {
+				if ($item->query['view'] != $view) {
 					array_shift($path);
 				} else {
-					if(!$views[$view]->nestable) {
+					if (!$views[$view]->nestable) {
 						array_shift($path);
 					} else {
 						$i--;
@@ -399,14 +400,14 @@ class plgSystemRouter extends JPlugin
 			}
 			unset($query[$views[$view]->child_id]);
 		}
-		if(isset($query['layout']) && isset($views[$view]->layouts[$query['layout']])) {
+		if (isset($query['layout']) && isset($views[$view]->layouts[$query['layout']])) {
 			//$segments[] = $views[$view]->layouts[$query['layout']];
 		}
 		unset($query['layout']);
 		unset($query['view']);
 		unset($query['ts']);
 		unset($query[$views[$view]->id]);
-        foreach($segments as &$segment)
+        foreach ($segments as &$segment)
         {
             $segment = str_replace(':', '-', $segment);
         }
@@ -430,15 +431,18 @@ class plgSystemRouter extends JPlugin
         $vars = array_merge($active->query, $vars);
 
 		$nestable = false;
-		foreach ($segments as $segment) {
+		foreach ($segments as $segment)
+		{
 			$found = false;
 
 			@list($id, $alias) = explode('-', $segment, 2);
-			for($i = 0; $i < count($cview); $i++) {
+			for ($i = 0; $i < count($cview); $i++) 
+			{
 				$view = $cview[$i];
-				if(isset($view->id) && (int) $id > 0) {
+				if (isset($view->id) && (int) $id > 0)
+				{
 					$found = true;
-					if($view->nestable) {
+					if ($view->nestable) {
 						$item = call_user_func(array($router, 'get'.ucfirst($view->name)), $id);
 						if($item->alias != $alias) {
 							$found = false;
@@ -448,11 +452,11 @@ class plgSystemRouter extends JPlugin
 						$nestable = true;
 					}
 					$vars['view'] = $view->name;
-					if(isset($view->parent->id) && isset($vars[$view->parent->id])) {
+					if (isset($view->parent->id) && isset($vars[$view->parent->id])) {
 						$vars[$view->parent_id] = $vars[$view->parent->id];
 					}
 
-                    if($alias)
+                    if ($alias)
                     {
                         $vars[$view->id] = $id.':'.$alias;
                     } else {
@@ -460,16 +464,16 @@ class plgSystemRouter extends JPlugin
                     }
 
 
-				} elseif($view->title == $segment) {
+				} elseif ($view->title == $segment) {
 					$vars['view'] = $view->name;
 
 					$found = true;
 					break;
 				}
 			}
-			if($found) {
-				if(!$nestable) {
-					if(!isset($cview->children)) {
+			if ($found) {
+				if (!$nestable) {
+					if (!isset($cview->children)) {
 						break;
 					}
 					$cview = $cview->children;

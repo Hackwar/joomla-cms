@@ -1,6 +1,5 @@
 <?php
 /**
- * @version		$Id$
  * @package		Joomla.Site
  * @subpackage	Application
  * @copyright	Copyright (C) 2005 - 2011 Open Source Matters, Inc. All rights reserved.
@@ -9,10 +8,6 @@
 
 // No direct access
 defined('JPATH_BASE') or die;
-
-//Register JComponentRouter and its Interface class
-JLoader::register('JComponentRouter', JPATH_LIBRARIES.'/joomla/application/component/router.php');
-JLoader::register('JComponentRouterInterface', JPATH_LIBRARIES.'/joomla/application/component/router.php');
 
 /**
  * Class to create and parse routes for the site application
