@@ -106,7 +106,7 @@ class JComponentRouterViewconfiguration
 	 * 
 	 * @return  JComponentRouterViewconfiguration  This object for chaining
 	 *
-	 * @since 3.4
+	 * @since   3.4
 	 */
 	public function setName($name)
 	{
@@ -125,7 +125,7 @@ class JComponentRouterViewconfiguration
 	 * 
 	 * @return  JComponentRouterViewconfiguration  This object for chaining
 	 *
-	 * @since 3.4
+	 * @since   3.4
 	 */
 	public function setKey($key)
 	{
@@ -161,7 +161,7 @@ class JComponentRouterViewconfiguration
 			}
 		}
 
-		$this->parent = $parent;
+		$this->parent       = $parent;
 		$parent->children[] = $this;
 
 		$this->path   = $parent->path;
@@ -184,7 +184,7 @@ class JComponentRouterViewconfiguration
 	 * 
 	 * @return  JComponentRouterViewconfiguration  This object for chaining
 	 *
-	 * @since 3.4
+	 * @since   3.4
 	 */
 	public function setNestable($isNestable = true)
 	{
@@ -200,7 +200,7 @@ class JComponentRouterViewconfiguration
 	 * 
 	 * @return  JComponentRouterViewconfiguration  This object for chaining
 	 *
-	 * @since 3.4
+	 * @since   3.4
 	 */
 	public function addLayout($layout)
 	{
@@ -217,7 +217,7 @@ class JComponentRouterViewconfiguration
 	 * 
 	 * @return  JComponentRouterViewconfiguration  This object for chaining
 	 *
-	 * @since 3.4
+	 * @since   3.4
 	 */
 	public function removeLayout($layout)
 	{
