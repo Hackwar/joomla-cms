@@ -17,7 +17,7 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 	/**
 	 * Name of the router of the component
 	 *
-	 * @var string
+	 * @var   string
 	 * @since 3.4
 	 */
 	protected $name;
@@ -25,7 +25,7 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 	/**
 	 * Array of rules
 	 * 
-	 * @var array
+	 * @var   array
 	 * @since 3.4
 	 */
 	protected $rules = array();
@@ -33,7 +33,7 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 	/**
 	 * Views of the component
 	 * 
-	 * @var array
+	 * @var   array
 	 * @since 3.4
 	 */
 	protected $views = array();
@@ -43,9 +43,9 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 	 * 
 	 * @param   JComponentRouterViewconfiguration  $view  View configuration object
 	 * 
-	 * @return void
+	 * @return  void
 	 * 
-	 * @since 3.4
+	 * @since   3.4
 	 */
 	public function registerView(JComponentRouterViewconfiguration $view)
 	{
@@ -55,9 +55,9 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 	/**
 	 * Return an array of registered view objects
 	 * 
-	 * @return array|JComponentRouterViewconfiguration Array of registered view objects
+	 * @return  array|JComponentRouterViewconfiguration Array of registered view objects
 	 * 
-	 * @since 3.4
+	 * @since   3.4
 	 */
 	public function getViews()
 	{
@@ -74,9 +74,9 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 	 */
 	public function getPath($query)
 	{
-		$views = $this->getViews();
+		$views  = $this->getViews();
 		$result = array();
-		$key = false;
+		$key    = false;
 
 		// Get the right view object
 		if (isset($query['view']) && $views[$query['view']])
@@ -87,8 +87,8 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 		// Get the path from the current item to the root view with all IDs
 		if (isset($viewobj))
 		{
-			$path = array_reverse($viewobj->path);
-			$start = true;
+			$path     = array_reverse($viewobj->path);
+			$start    = true;
 			$childkey = false;
 
 			foreach ($path as $element)
@@ -104,14 +104,17 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 				{
 					$key = $childkey;
 				}
+
 				$childkey = $view->parent_key;
 
 				if ($key && isset($query[$key]))
 				{
 					$result[$view->name] = array($query[$key]);
+
 					if ($view->nestable && is_callable(array($this, 'get' . ucfirst($view->name))))
 					{
 						$nestable = call_user_func_array(array($this, 'get' . ucfirst($view->name)), array($query[$key]));
+
 						if ($nestable)
 						{
 							$result[$view->name] = array_reverse($nestable->getPath());
@@ -124,6 +127,7 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 				}
 			}
 		}
+
 		return $result;
 	}
 
@@ -132,7 +136,7 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 	 * 
 	 * @return array  All currently attached rules in an array
 	 * 
-	 * @since 3.4
+	 * @since  3.4
 	 */
 	public function getRules()
 	{
@@ -144,9 +148,9 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 	 * 
 	 * @param   array  $rules  Array of JComponentRouterRulesInterface objects
 	 * 
-	 * @return void
+	 * @return  void
 	 * 
-	 * @since 3.4
+	 * @since   3.4
 	 */
 	public function attachRules($rules)
 	{
@@ -161,7 +165,7 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 	 *
 	 * @param   JComponentRouterRulesInterface  $rule  The function to be called.
 	 * 
-	 * @return   void
+	 * @return  void
 	 */
 	public function attachRule(JComponentRouterRulesInterface $rule)
 	{
@@ -196,7 +200,7 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 	 *
 	 * @return  array  The URL arguments to use to assemble the subsequent URL.
 	 *
-	 * @since   3.3
+	 * @since   3.4
 	 */
 	public function preprocess($query)
 	{
@@ -210,10 +214,12 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 
 	/**
 	 * Build method for URLs
-	 * 
+	 *
 	 * @param   array  &$query  Array of query elements
-	 * 
-	 * @return   array  Array of URL segments
+	 *
+	 * @return  array  Array of URL segments
+	 *
+	 * @since   3.4
 	 */
 	public function build(&$query)
 	{
@@ -224,6 +230,7 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 		{
 			$rule->build($query, $segments);
 		}
+
 		return $segments;
 	}
 
@@ -232,7 +239,9 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 	 * 
 	 * @param   array  &$segments  Array of URL string-segments
 	 * 
-	 * @return   array  Associative array of query values
+	 * @return  array  Associative array of query values
+	 *
+	 * @since   3.4
 	 */
 	public function parse(&$segments)
 	{
@@ -243,6 +252,7 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 		{
 			$rule->parse($segments, $vars);
 		}
+
 		return $vars;
 	}
 
@@ -258,10 +268,12 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 		if (empty($this->name))
 		{
 			$r = null;
+
 			if (!preg_match('/(.*)Router/i', get_class($this), $r))
 			{
 				throw new Exception('JLIB_APPLICATION_ERROR_ROUTER_GET_NAME', 500);
 			}
+
 			$this->name = strtolower($r[1]);
 		}
 
@@ -275,13 +287,14 @@ abstract class JComponentRouterAdvanced extends JComponentRouterBase
 	 * 
 	 * @param   int  $id  ID of the category to load
 	 * 
-	 * @return   JCategoryNode  Category identified by $id
+	 * @return  JCategoryNode  Category identified by $id
 	 * 
-	 * @since 3.4
+	 * @since   3.4
 	 */
 	public function getCategory($id)
 	{
 		$category = JCategories::getInstance($this->getName())->get($id);
+
 		return $category;
 	}
 }
