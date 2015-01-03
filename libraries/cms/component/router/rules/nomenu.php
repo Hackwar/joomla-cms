@@ -17,7 +17,7 @@ class JComponentRouterRulesNomenu implements JComponentRouterRulesInterface
 	/**
 	 * Router this rule belongs to
 	 *
-	 * @var JComponentRouterAdvanced
+	 * @var   JComponentRouterAdvanced
 	 * @since 3.4
 	 */
 	protected $router;
@@ -93,6 +93,7 @@ class JComponentRouterRulesNomenu implements JComponentRouterRulesInterface
 		if (!isset($query['Itemid']) && isset($query['view']))
 		{
 			$views = $this->router->getViews();
+
 			if (isset($views[$query['view']]))
 			{
 				$segments[] = $query['view'];
@@ -103,6 +104,7 @@ class JComponentRouterRulesNomenu implements JComponentRouterRulesInterface
 					$segments[] = str_replace(':', '-', $query[$key]);
 					unset($query[$views[$query['view']]->key]);
 				}
+
 				unset($query['view']);
 			}
 		}
