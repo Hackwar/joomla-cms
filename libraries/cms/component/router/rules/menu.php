@@ -17,7 +17,7 @@ class JComponentRouterRulesMenu implements JComponentRouterRulesInterface
 	/**
 	 * Router this rule belongs to
 	 *
-	 * @var JComponentRouterAdvanced
+	 * @var   JComponentRouterAdvanced
 	 * @since 3.4
 	 */
 	protected $router;
@@ -25,7 +25,7 @@ class JComponentRouterRulesMenu implements JComponentRouterRulesInterface
 	/**
 	 * Lookup array of the menu items
 	 *
-	 * @var array
+	 * @var   array
 	 * @since 3.4
 	 */
 	protected $lookup = array();
@@ -61,6 +61,7 @@ class JComponentRouterRulesMenu implements JComponentRouterRulesInterface
 		}
 
 		$language = '*';
+
 		if (isset($query['lang']))
 		{
 			$language = $query['lang'];
@@ -82,13 +83,16 @@ class JComponentRouterRulesMenu implements JComponentRouterRulesInterface
 					if (is_bool($ids))
 					{
 						$query['Itemid'] = $this->lookup[$language][$view];
+
 						return;
 					}
+
 					foreach ($ids as $id)
 					{
 						if (isset($this->lookup[$language][$view][(int) $id]))
 						{
 							$query['Itemid'] = $this->lookup[$language][$view][(int) $id];
+
 							return;
 						}
 					}
@@ -100,9 +104,11 @@ class JComponentRouterRulesMenu implements JComponentRouterRulesInterface
 		$active = $this->router->menu->getActive();
 
 		if ($active && $active->component == 'com_' . $this->router->getName()
-			&& ($language == '*' || in_array($active->language, array('*', $language)) || !JLanguageMultilang::isEnabled()))
+			&& ($language == '*' || in_array($active->language, array('*', $language))
+			|| !JLanguageMultilang::isEnabled()))
 		{
 			$query['Itemid'] = $active->id;
+
 			return;
 		}
 
@@ -132,7 +138,7 @@ class JComponentRouterRulesMenu implements JComponentRouterRulesInterface
 			$this->lookup[$language] = array();
 
 			$component  = JComponentHelper::getComponent('com_' . $this->router->getName());
-			$views = $this->router->getViews();
+			$views      = $this->router->getViews();
 
 			$attributes = array('component_id');
 			$values     = array((int) $component->id);
@@ -161,7 +167,8 @@ class JComponentRouterRulesMenu implements JComponentRouterRulesInterface
 						 * language == * cannot override existing entries
 						 */
 						if (isset($item->query[$views[$view]->key])
-							&& (!isset($this->lookup[$language][$view][$item->query[$views[$view]->key]]) || $item->language != '*'))
+							&& (!isset($this->lookup[$language][$view][$item->query[$views[$view]->key]])
+							|| $item->language != '*'))
 						{
 							$this->lookup[$language][$view][$item->query['id']] = $item->id;
 						}
