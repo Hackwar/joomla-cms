@@ -17,7 +17,7 @@ class JComponentRouterViewconfiguration
 	/**
 	 * Name of the view
 	 * 
-	 * @var string
+	 * @var   string
 	 * @since 3.4
 	 */
 	public $name;
@@ -25,7 +25,7 @@ class JComponentRouterViewconfiguration
 	/**
 	 * Key of the view
 	 * 
-	 * @var string
+	 * @var   string
 	 * @since 3.4
 	 */
 	public $key = false;
@@ -33,7 +33,7 @@ class JComponentRouterViewconfiguration
 	/**
 	 * Parentview of this one
 	 * 
-	 * @var JComponentRouterViewconfiguration
+	 * @var   JComponentRouterViewconfiguration
 	 * @since 3.4
 	 */
 	public $parent = false;
@@ -41,7 +41,7 @@ class JComponentRouterViewconfiguration
 	/**
 	 * Key of the parentview
 	 * 
-	 * @var string
+	 * @var   string
 	 * @since 3.4
 	 */
 	public $parent_key = false;
@@ -49,7 +49,7 @@ class JComponentRouterViewconfiguration
 	/**
 	 * Is this view nestable?
 	 * 
-	 * @var bool
+	 * @var   bool
 	 * @since 3.4
 	 */
 	public $nestable = false;
@@ -57,7 +57,7 @@ class JComponentRouterViewconfiguration
 	/**
 	 * Layouts that are supported by this view
 	 * 
-	 * @var array
+	 * @var   array
 	 * @since 3.4
 	 */
 	public $layouts = array('default');
@@ -65,7 +65,7 @@ class JComponentRouterViewconfiguration
 	/**
 	 * Child-views of this view
 	 * 
-	 * @var array
+	 * @var   array
 	 * @since 3.4
 	 */
 	public $children = array();
@@ -73,7 +73,7 @@ class JComponentRouterViewconfiguration
 	/**
 	 * Keys used for this parent view by the child views
 	 * 
-	 * @var array
+	 * @var   array
 	 * @since 3.4
 	 */
 	public $child_keys = array();
@@ -81,7 +81,7 @@ class JComponentRouterViewconfiguration
 	/**
 	 * Path of views from this one to the root view
 	 * 
-	 * @var array
+	 * @var   array
 	 * @since 3.4
 	 */
 	public $path = array();
@@ -89,13 +89,13 @@ class JComponentRouterViewconfiguration
 	/**
 	 * Constructor for the View-configuration class
 	 * 
-	 * @param   string  $name  Name of the view
+	 * @param  string  $name  Name of the view
 	 * 
-	 * @since 3.4
+	 * @since  3.4
 	 */
 	public function __construct($name)
 	{
-		$this->name = $name;
+		$this->name   = $name;
 		$this->path[] = $name;
 	}
 
@@ -105,6 +105,7 @@ class JComponentRouterViewconfiguration
 	 * @param   string  $name  Name of the view
 	 * 
 	 * @return  JComponentRouterViewconfiguration  This object for chaining
+	 *
 	 * @since 3.4
 	 */
 	public function setName($name)
@@ -123,6 +124,7 @@ class JComponentRouterViewconfiguration
 	 * @param   string  $key  Key of the view
 	 * 
 	 * @return  JComponentRouterViewconfiguration  This object for chaining
+	 *
 	 * @since 3.4
 	 */
 	public function setKey($key)
@@ -139,7 +141,8 @@ class JComponentRouterViewconfiguration
 	 * @param   string                             $parent_key  Key of the parent view in this context
 	 * 
 	 * @return  JComponentRouterViewconfiguration  This object for chaining
-	 * @since 3.4
+	 *
+	 * @since   3.4
 	 */
 	public function setParent(JComponentRouterViewconfiguration $parent, $parent_key = false)
 	{
@@ -161,7 +164,7 @@ class JComponentRouterViewconfiguration
 		$this->parent = $parent;
 		$parent->children[] = $this;
 
-		$this->path = $parent->path;
+		$this->path   = $parent->path;
 		$this->path[] = $this->name;
 
 		$this->parent_key = $parent_key;
@@ -180,6 +183,7 @@ class JComponentRouterViewconfiguration
 	 * @param   bool  $isNestable  If set to true, the view is nestable
 	 * 
 	 * @return  JComponentRouterViewconfiguration  This object for chaining
+	 *
 	 * @since 3.4
 	 */
 	public function setNestable($isNestable = true)
@@ -195,6 +199,7 @@ class JComponentRouterViewconfiguration
 	 * @param   string  $layout  Layouts that this view supports
 	 * 
 	 * @return  JComponentRouterViewconfiguration  This object for chaining
+	 *
 	 * @since 3.4
 	 */
 	public function addLayout($layout)
@@ -211,6 +216,7 @@ class JComponentRouterViewconfiguration
 	 * @param   string  $layout  Layouts that this view supports
 	 * 
 	 * @return  JComponentRouterViewconfiguration  This object for chaining
+	 *
 	 * @since 3.4
 	 */
 	public function removeLayout($layout)
