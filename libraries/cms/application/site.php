@@ -570,7 +570,7 @@ final class JApplicationSite extends JApplicationCms
 			$user->groups = array($guestUsergroup);
 		}
 
-		// Determine the language settings.
+		// Determine the language settings
 		// SMZ: $options['language'] is for sure empty at this time...
 
 		// See if a language was specified: this has top priority.
@@ -591,7 +591,7 @@ final class JApplicationSite extends JApplicationCms
 			// Detect default language
 			$params = JComponentHelper::getParams('com_languages');
 			$options['language'] = $params->get('site', $this->get('language', 'en-GB'));
-			echo 'com_languages = ' . print_r($options['language'], true) . echo '<br />';
+			echo 'com_languages = ' . print_r($options['language'], true) . '<br />';
 		}
 
 		// One last check to make sure we have something
@@ -599,13 +599,13 @@ final class JApplicationSite extends JApplicationCms
 		{
 			// SMZ: But does this *really* exist? My bet is that we are always getting the 'en-GB' fallback...
 			$options['language'] = self::checkLang($this->config->get('language', 'en-GB'));
-			echo 'site = ' . print_r($options['language'], true) . echo '<br />';
+			echo 'site = ' . print_r($options['language'], true) . '<br />';
 
 			// As a last ditch fail to english
 			if (empty($options['language']))
 			{
 				$options['language'] = 'en-GB';
-				echo 'last ditch = ' . print_r($options['language'], true) . echo '<br />';
+				echo 'last ditch = ' . print_r($options['language'], true) . '<br />';
 			}
 		}
 
