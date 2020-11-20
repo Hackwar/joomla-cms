@@ -923,33 +923,41 @@ class Indexer
 		// Iterate through the tokens to create SQL value sets.
 		if (!is_a($tokens, Token::class))
 		{
-			foreach ($tokens as $token)
+			$token_groups = array_chunk($tokens, 128);
+
+			foreach ($token_groups as $token_group)
 			{
-				if ($filterCommon && $token->common)
+				$added = 0;
+
+				foreach ($token_group as $token)
 				{
-					continue;
+					if ($filterCommon && $token->common)
+					{
+						continue;
+					}
+
+					if ($filterNumeric && $token->numeric)
+					{
+						continue;
+					}
+
+					$query->values(
+						$db->quote($token->term) . ', '
+						. $db->quote($token->stem) . ', '
+						. (int) $token->common . ', '
+						. (int) $token->phrase . ', '
+						. $db->quote($token->weight) . ', '
+						. (int) $context . ', '
+						. $db->quote($token->language)
+					);
+					$added++;
 				}
 
-				if ($filterNumeric && $token->numeric)
-				{
-					continue;
-				}
-
-				$query->values(
-					$db->quote($token->term) . ', '
-					. $db->quote($token->stem) . ', '
-					. (int) $token->common . ', '
-					. (int) $token->phrase . ', '
-					. $db->quote($token->weight) . ', '
-					. (int) $context . ', '
-					. $db->quote($token->language)
-				);
-				$values++;
-
-				if ($values > 0 && ($values % 128) == 0)
+				if ($added)
 				{
 					$db->setQuery($query)->execute();
 					$query->clear('values');
+					$values += $added;
 
 					// Check if we're approaching the memory limit of the token table.
 					if ($values > static::$state->options->get('memory_table_limit', 10000))
