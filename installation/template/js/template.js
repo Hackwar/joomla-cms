@@ -8,20 +8,7 @@
   Joomla = window.Joomla || {};
   Joomla.installation = Joomla.installation || {};
 
-  Joomla.serialiseForm = function( form ) {
-    var i, l, obj = [], elements = form.querySelectorAll( "input, select, textarea" );
-    for(i = 0, l = elements.length; i < l; i++) {
-      var name = elements[i].name;
-      var value = elements[i].value;
-      if(name) {
-        if (((elements[i].type === 'checkbox' || elements[i].type === 'radio') && elements[i].checked === true) || (elements[i].type !== 'checkbox' && elements[i].type !== 'radio')) {
-          obj.push(name.replace('[', '%5B').replace(']', '%5D') + '=' + encodeURIComponent(value));
-        }
-      }
-    }
-    return obj.join("&");
-  };
-
+  Joomla.serialiseForm = ( form ) => new URLSearchParams(new FormData(form));
 
   /**
    * Method to request a different page via AJAX
@@ -50,15 +37,13 @@
    * @return {Boolean}
    */
   Joomla.submitform = function(form) {
-    var data = Joomla.serialiseForm(form);
-
     document.body.appendChild(document.createElement('joomla-core-loader'));
     Joomla.removeMessages();
 
     Joomla.request({
       type     : "POST",
       url      : Joomla.baseUrl,
-      data     : data,
+      data     : new URLSearchParams(new FormData(form)),
       dataType : 'json',
       onSuccess: function (response, xhr) {
         response = JSON.parse(response);
@@ -166,12 +151,11 @@
     }
 
     var task = tasks.shift();
-    var data = Joomla.serialiseForm(form);
 
     Joomla.request({
       method: "POST",
       url : Joomla.baseUrl + '?task=installation.' + task + '&format=json',
-      data: data,
+      data: new URLSearchParams(new FormData(form)),
       perform: true,
       onSuccess: function(response, xhr){
         try {
