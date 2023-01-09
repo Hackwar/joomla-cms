@@ -10,14 +10,13 @@
  * @return {Boolean}
  */
 Joomla.setlanguage = function(form) {
-  var data = Joomla.serialiseForm(form);
   Joomla.removeMessages();
   document.body.appendChild(document.createElement('joomla-core-loader'));
 
   Joomla.request({
     url: Joomla.baseUrl,
     method: 'POST',
-    data: data,
+    data: new URLSearchParams(new FormData(form)),
     perform: true,
     onSuccess: function(response, xhr){
       response = JSON.parse(response);
@@ -76,26 +75,29 @@ Joomla.checkInputs = function() {
 Joomla.checkDbCredentials = function() {
   const progress = document.getElementById('progressbar');
   const progress_text = document.getElementById('progress-text');
-  var form = document.getElementById('adminForm'),
-    data = Joomla.serialiseForm(form);
+  var form = document.getElementById('adminForm');
 
+  function revealBtns(taskNo) {
+    for (let i = 1; i <= taskNo; i++) {
+      document.getElementById(`installStep${i}`).classList.add('active');
+    }
+    document.getElementById(`installStep4`).classList.remove('active');
+  }
   // Reveal everything
-  document.getElementById('installStep1').classList.remove('active');
-  document.getElementById('installStep2').classList.remove('active');
-  document.getElementById('installStep3').classList.remove('active');
-  document.getElementById('installStep4').classList.add('active');
+  revealBtns(4);
   progress_text.innerText = Joomla.Text._('INSTL_IN_PROGRESS');
 
   Joomla.request({
     method: "POST",
     url : Joomla.installationBaseUrl + '?task=installation.dbcheck&format=json',
-    data: data,
+    data: new URLSearchParams(new FormData(form)),
     perform: true,
     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
     onSuccess: function(response, xhr){
       try {
         response = JSON.parse(response);
       } catch (e) {
+        revealBtns(4);
         progress_text.setAttribute('role', 'alert');
         progress_text.classList.add('error');
         progress_text.innerText = response;
@@ -113,10 +115,7 @@ Joomla.checkDbCredentials = function() {
       Joomla.replaceTokens(response.token);
 
       if (response.error) {
-        document.getElementById('installStep1').classList.add('active');
-        document.getElementById('installStep2').classList.add('active');
-        document.getElementById('installStep3').classList.add('active');
-        document.getElementById('installStep4').classList.remove('active');
+        revealBtns(4);
         progress_text.innerText = Joomla.Text._('INSTL');
         Joomla.renderMessages({'error': [response.message]});
       } else if (response.data && response.data.validated === true) {
@@ -140,6 +139,7 @@ Joomla.checkDbCredentials = function() {
         alert(r.message);
       } catch (e) {
       }
+      revealBtns(4);
     }
   });
 };
