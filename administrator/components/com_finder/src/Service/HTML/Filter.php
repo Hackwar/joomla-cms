@@ -15,6 +15,7 @@ use Joomla\CMS\Filter\OutputFilter;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Multilanguage;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\Component\Finder\Administrator\Helper\LanguageHelper;
 use Joomla\Component\Finder\Administrator\Indexer\Query;
 use Joomla\Database\DatabaseAwareTrait;
@@ -342,59 +343,14 @@ class Filter
             $cache->store($branches, $cacheId);
         }
 
-        $html = '';
+        $displayData = array();
+        $displayData['showDates'] = $showDates;
+        $displayData['idxQuery']  = $idxQuery;
+        $displayData['options']   = $options;
+        $displayData['classSuffix'] = $classSuffix;
+        $displayData['branches']  = $branches;
 
-        // Add the dates if enabled.
-        if ($showDates) {
-            $html .= HTMLHelper::_('filter.dates', $idxQuery, $options);
-        }
-
-        $html .= '<div class="filter-branch' . $classSuffix . '">';
-
-        // Iterate through all branches and build code.
-        foreach ($branches as $bk => $bv) {
-            // If the multi-lang plugin is enabled then drop the language branch.
-            if ($bv->title === 'Language' && Multilanguage::isEnabled()) {
-                continue;
-            }
-
-            $active = null;
-
-            // Check if the branch is in the filter.
-            if (array_key_exists($bv->title, $idxQuery->filters)) {
-                // Get the request filters.
-                $temp   = Factory::getApplication()->getInput()->request->get('t', [], 'array');
-
-                // Search for active nodes in the branch and get the active node.
-                $active = array_intersect($temp, $idxQuery->filters[$bv->title]);
-                $active = count($active) === 1 ? array_shift($active) : null;
-            }
-
-            // Build a node.
-            $html .= '<div class="control-group">';
-            $html .= '<div class="control-label">';
-            $html .= '<label for="tax-' . OutputFilter::stringURLSafe($bv->title) . '">';
-            $html .= Text::sprintf('COM_FINDER_FILTER_BRANCH_LABEL', Text::_(LanguageHelper::branchSingular($bv->title)));
-            $html .= '</label>';
-            $html .= '</div>';
-            $html .= '<div class="controls">';
-            $html .= HTMLHelper::_(
-                'select.genericlist',
-                $branches[$bk]->nodes,
-                't[]',
-                'class="form-select advancedSelect"',
-                'id',
-                'title',
-                $active,
-                'tax-' . OutputFilter::stringURLSafe($bv->title)
-            );
-            $html .= '</div>';
-            $html .= '</div>';
-        }
-
-        $html .= '</div>';
-
-        return $html;
+        return LayoutHelper::render('joomla.finder.filter_select', $displayData);
     }
 
     /**
