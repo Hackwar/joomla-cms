@@ -11,7 +11,6 @@
 namespace Joomla\Component\Finder\Administrator\Service\HTML;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Filter\OutputFilter;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Multilanguage;
 use Joomla\CMS\Language\Text;
@@ -365,71 +364,17 @@ class Filter
      */
     public function dates($idxQuery, $options)
     {
+        // Get the configuration options.
+        $displayData = array();
+        $displayData['classSuffix'] = $options->get('class_suffix', null);
+        $displayData['loadMedia']  =  $options->get('load_media', true);
+        $displayData['idxQuery']   =  $idxQuery;
+        $displayData['options']   =  $options;
+
         $html = '';
 
-        // Get the configuration options.
-        $classSuffix = $options->get('class_suffix', null);
-        $loadMedia   = $options->get('load_media', true);
-        $showDates   = $options->get('show_date_filters', false);
-
-        if (!empty($showDates)) {
-            // Build the date operators options.
-            $operators   = [];
-            $operators[] = HTMLHelper::_('select.option', 'before', Text::_('COM_FINDER_FILTER_DATE_BEFORE'));
-            $operators[] = HTMLHelper::_('select.option', 'exact', Text::_('COM_FINDER_FILTER_DATE_EXACTLY'));
-            $operators[] = HTMLHelper::_('select.option', 'after', Text::_('COM_FINDER_FILTER_DATE_AFTER'));
-
-            // Load the CSS/JS resources.
-            if ($loadMedia) {
-                /** @var \Joomla\CMS\WebAsset\WebAssetManager $wa */
-                $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
-                $wa->useStyle('com_finder.dates');
-            }
-
-            // Open the widget.
-            $html .= '<ul id="finder-filter-select-dates">';
-
-            // Start date filter.
-            $attribs['class'] = 'input-medium';
-            $html .= '<li class="filter-date float-start' . $classSuffix . '">';
-            $html .= '<label for="filter_date1" class="hasTooltip" title ="' . Text::_('COM_FINDER_FILTER_DATE1_DESC') . '">';
-            $html .= Text::_('COM_FINDER_FILTER_DATE1');
-            $html .= '</label>';
-            $html .= '<br>';
-            $html .= HTMLHelper::_(
-                'select.genericlist',
-                $operators,
-                'w1',
-                'class="inputbox filter-date-operator advancedSelect form-select w-auto mb-2"',
-                'value',
-                'text',
-                $idxQuery->when1,
-                'finder-filter-w1'
-            );
-            $html .= HTMLHelper::_('calendar', $idxQuery->date1, 'd1', 'filter_date1', '%Y-%m-%d', $attribs);
-            $html .= '</li>';
-
-            // End date filter.
-            $html .= '<li class="filter-date float-end' . $classSuffix . '">';
-            $html .= '<label for="filter_date2" class="hasTooltip" title ="' . Text::_('COM_FINDER_FILTER_DATE2_DESC') . '">';
-            $html .= Text::_('COM_FINDER_FILTER_DATE2');
-            $html .= '</label>';
-            $html .= '<br>';
-            $html .= HTMLHelper::_(
-                'select.genericlist',
-                $operators,
-                'w2',
-                'class="inputbox filter-date-operator advancedSelect form-select w-auto mb-2"',
-                'value',
-                'text',
-                $idxQuery->when2,
-                'finder-filter-w2'
-            );
-            $html .= HTMLHelper::_('calendar', $idxQuery->date2, 'd2', 'filter_date2', '%Y-%m-%d', $attribs);
-            $html .= '</li>';
-
-            // Close the widget.
-            $html .= '</ul>';
+        if (!empty($options->get('show_date_filters', false))) {
+            $html = LayoutHelper::render('joomla.finder.filter_dates', $displayData);
         }
 
         return $html;
