@@ -13,6 +13,7 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Filter\OutputFilter;
 use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\HTML\Registry;
 use Joomla\Component\Finder\Administrator\Helper\LanguageHelper;
 use Joomla\Component\Finder\Administrator\Indexer\Query;
 use Joomla\CMS\Language\Multilanguage;
@@ -23,11 +24,11 @@ extract($displayData);
 /**
  * Layout variables
  *
- * @var   array     $showDates    Optional parameters
- * @var   Query     $idxQuery     The id of the input this label is for
- * @var   string    $options      The name of the input this label is for
- * @var   string    $classSuffix  The html code for the label
- * @var   object[]  $branches     The input field html code
+ * @var   string    $showDates    TODO: Add description...
+ * @var   Query     $idxQuery     TODO: Add description...
+ * @var   Registry  $options      TODO: Add description...
+ * @var   string    $classSuffix  The class suffix
+ * @var   object[]  $branches     The finder branches
  */
 
 // Add the dates if enabled.
@@ -61,7 +62,7 @@ echo HTMLHelper::_('filter.dates', $idxQuery, $options);
         <div class="control-group">
             <div class="control-label">
                 <label for="tax-<?= OutputFilter::stringURLSafe($bv->title) ?>">
-                    <?= Text::sprintf('COM_FINDER_FILTER_BRANCH_LABEL', Text::_(LanguageHelper::branchSingular($bv->title))); ?>wewerwerwer
+                    <?= Text::sprintf('COM_FINDER_FILTER_BRANCH_LABEL', Text::_(LanguageHelper::branchSingular($bv->title))); ?>
                 </label>
             </div>
             <div class="controls">
