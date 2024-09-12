@@ -1717,16 +1717,16 @@
         },
         {
             "name": "joomla/filesystem",
-            "version": "3.0.0",
+            "version": "3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joomla-framework/filesystem.git",
-                "reference": "1398fe1b3acbd97c5237cd9b405530a1f7d49daa"
+                "reference": "c69358f6500b8d931bd6e4e3042aa365dcace155"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joomla-framework/filesystem/zipball/1398fe1b3acbd97c5237cd9b405530a1f7d49daa",
-                "reference": "1398fe1b3acbd97c5237cd9b405530a1f7d49daa",
+                "url": "https://api.github.com/repos/joomla-framework/filesystem/zipball/c69358f6500b8d931bd6e4e3042aa365dcace155",
+                "reference": "c69358f6500b8d931bd6e4e3042aa365dcace155",
                 "shasum": ""
             },
             "require": {
@@ -1765,7 +1765,7 @@
             ],
             "support": {
                 "issues": "https://github.com/joomla-framework/filesystem/issues",
-                "source": "https://github.com/joomla-framework/filesystem/tree/3.0.0"
+                "source": "https://github.com/joomla-framework/filesystem/tree/3.0.2"
             },
             "funding": [
                 {
@@ -1777,7 +1777,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-10-07T21:08:48+00:00"
+            "time": "2024-09-12T11:44:35+00:00"
         },
         {
             "name": "joomla/filter",
