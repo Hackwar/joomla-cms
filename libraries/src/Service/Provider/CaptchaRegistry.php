@@ -38,19 +38,19 @@ class CaptchaRegistry implements ServiceProviderInterface
     public function register(Container $container)
     {
         $container->alias('captcharegistry', Registry::class)
-            ->share(
-                Registry::class,
-                function (Container $container) {
-                    $dispatcher = $container->get(DispatcherInterface::class);
-                    $registry   = new Registry();
-                    $registry->setDispatcher($dispatcher);
+        ->share(
+            Registry::class,
+            function (Container $container) {
+                $dispatcher = $container->get(DispatcherInterface::class);
+                $registry   = new Registry();
+                $registry->setDispatcher($dispatcher);
 
-                    PluginHelper::importPlugin('captcha', null, true, $dispatcher);
-                    $registry->initRegistry();
+                PluginHelper::importPlugin('captcha', null, true, $dispatcher);
+                $registry->initRegistry();
 
-                    return $registry;
-                },
-                true
-            );
+                return $registry;
+            },
+            true
+        );
     }
 }

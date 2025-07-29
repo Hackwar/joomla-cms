@@ -14,6 +14,7 @@ use Joomla\CMS\Event\AbstractEvent;
 use Joomla\CMS\Event\View\DisplayEvent;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\SiteRouterAwareTrait;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\User\CurrentUserInterface;
 use Joomla\CMS\User\CurrentUserTrait;

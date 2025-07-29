@@ -79,7 +79,7 @@ class MVCFactory implements MVCFactoryInterface, FormFactoryAwareInterface, Site
     public function __construct($namespace, ?LoggerInterface $logger = null)
     {
         $this->namespace = $namespace;
-        $this->logger    = $logger;
+        $this->logger = $logger;
     }
 
     /**
