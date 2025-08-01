@@ -29,7 +29,7 @@ class BannersController extends ApiController
      * @var    string
      * @since  4.0.0
      */
-    protected $contentType = 'banners';
+    protected $contentType =       'banners';
 
     /**
      * The default view for the display method.
@@ -37,5 +37,5 @@ class BannersController extends ApiController
      * @var    string
      * @since  3.0
      */
-    protected $default_view = 'banners';
+    protected $default_view =     'banners';
 }
