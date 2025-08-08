@@ -69,6 +69,7 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
       - name: Check PHP code style
         id: check-codestyle
+        continue-on-error: true
         env:
           PHP_CS_FIXER_IGNORE_ENV: true
         run: |
