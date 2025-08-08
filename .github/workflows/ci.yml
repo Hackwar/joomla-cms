@@ -78,6 +78,7 @@ jobs:
       - uses: parkerbxyz/suggest-changes@v2
         with:
           comment: 'Your code does not comply with our codestyle. Please commit the suggested changes.'
+          event: 'REQUEST_CHANGES'
 
   code-style-js-css:
     name: Check Javascript & CSS code style
