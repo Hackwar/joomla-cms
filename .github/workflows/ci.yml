@@ -75,7 +75,7 @@ jobs:
         run: |
           git config --global --add safe.directory $GITHUB_WORKSPACE
           ./libraries/vendor/bin/${{ matrix.command }}
-      - uses: parkerbxyz/suggest-changes@v2
+      - uses: parkerbxyz/suggest-changes@v2.0.5
         with:
           comment: 'Your code does not comply with our codestyle. Please commit the suggested changes.'
           event: 'REQUEST_CHANGES'
