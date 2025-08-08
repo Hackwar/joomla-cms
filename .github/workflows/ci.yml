@@ -68,12 +68,14 @@ jobs:
           path: libraries/vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
       - name: Check PHP code style
+        id: check-codestyle
         env:
           PHP_CS_FIXER_IGNORE_ENV: true
         run: |
           git config --global --add safe.directory $GITHUB_WORKSPACE
           ./libraries/vendor/bin/${{ matrix.command }}
       - uses: parkerbxyz/suggest-changes@v2
+        if: failure() && steps.check-codestyle.outcome == 'failure'
         with:
           comment: 'Your code does not comply with our codestyle. Please commit the suggested changes.'
 
