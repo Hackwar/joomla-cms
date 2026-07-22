@@ -20,6 +20,17 @@
       "name": "com_admin.admin-help",
       "type": "style",
       "uri": "com_admin/admin-help.min.css"
+    },
+    {
+      "name": "com_admin.filecheck",
+      "type": "script",
+      "uri": "com_admin/filecheck.min.js",
+      "dependencies": [
+        "core"
+      ],
+      "attributes": {
+        "type": "module"
+      }
     }
   ]
 }

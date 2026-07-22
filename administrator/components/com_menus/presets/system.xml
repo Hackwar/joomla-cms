@@ -80,6 +80,14 @@
 			link="index.php?option=com_admin&amp;view=sysinfo"
 			permission="core.admin"
 		/>
+
+		<menuitem
+			title="MOD_MENU_SYSTEM_INFORMATION_FILECHECK"
+			type="component"
+			element="com_admin"
+			link="index.php?option=com_admin&amp;view=filecheck"
+			permission="core.admin"
+		/>
 	</menuitem>
 
 	<menuitem

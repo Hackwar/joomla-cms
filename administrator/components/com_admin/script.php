@@ -16,6 +16,7 @@ use Joomla\CMS\Installer\Installer;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Log\Log;
 use Joomla\CMS\Table\Asset;
+use Joomla\CMS\Table\Menu;
 use Joomla\Database\ParameterType;
 use Joomla\Filesystem\File;
 use Joomla\Filesystem\Folder;
@@ -1459,6 +1460,78 @@ class JoomlaInstallerScript
     }
 
     /**
+     * Adds the "File Integrity Check" menu item for existing sites (fresh installs pick
+     * it up from the com_menus system preset instead). Idempotent, safe to call on every update.
+     *
+     * @return  boolean
+     *
+     * @since   6.2.0
+     */
+    protected function addFilecheckMenuItem(): bool
+    {
+        $db   = Factory::getDbo();
+        $link = 'index.php?option=com_admin&view=filecheck';
+
+        $query = $db->createQuery()
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__menu'))
+            ->where($db->quoteName('link') . ' = ' . $db->quote($link))
+            ->where($db->quoteName('client_id') . ' = 1');
+        $db->setQuery($query);
+
+        if ((int) $db->loadResult() > 0) {
+            return true;
+        }
+
+        $query = $db->createQuery()
+            ->select($db->quoteName('id'))
+            ->from($db->quoteName('#__menu'))
+            ->where($db->quoteName('link') . ' = ' . $db->quote('index.php?option=com_admin&view=sysinfo'))
+            ->where($db->quoteName('client_id') . ' = 1');
+        $db->setQuery($query);
+        $siblingId = (int) $db->loadResult();
+
+        if (!$siblingId) {
+            // The Sysinfo menu item was not found (unexpected); skip safely rather than fail the update.
+            return true;
+        }
+
+        $query = $db->createQuery()
+            ->select($db->quoteName('extension_id'))
+            ->from($db->quoteName('#__extensions'))
+            ->where($db->quoteName('element') . ' = ' . $db->quote('com_admin'))
+            ->where($db->quoteName('type') . ' = ' . $db->quote('component'));
+        $db->setQuery($query);
+        $componentId = (int) $db->loadResult();
+
+        $table               = new Menu($db);
+        $table->menutype     = 'main';
+        $table->title        = 'MOD_MENU_SYSTEM_INFORMATION_FILECHECK';
+        $table->alias        = 'filecheck';
+        $table->note         = '';
+        $table->link         = $link;
+        $table->type         = 'component';
+        $table->published    = 1;
+        $table->component_id = $componentId;
+        $table->parent_id    = 1;
+        $table->client_id    = 1;
+        $table->browserNav   = 0;
+        $table->access       = 1;
+        $table->img          = '';
+        $table->language     = '*';
+        $table->params       = '{}';
+        $table->setLocation($siblingId, 'after');
+
+        if (!$table->check() || !$table->store()) {
+            $this->collectError(__METHOD__, new \Exception($table->getError()));
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * This method clean the Joomla Cache using the method `clean` from the com_cache model
      *
      * @return  void
@@ -1494,6 +1567,8 @@ class JoomlaInstallerScript
         if ($action !== 'update') {
             return true;
         }
+
+        $this->addFilecheckMenuItem();
 
         if (empty($this->fromVersion) || version_compare($this->fromVersion, '6.0.0', 'ge')) {
             return true;
