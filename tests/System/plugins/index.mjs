@@ -1,7 +1,8 @@
-import { getMails, clearEmails, startMailServer } from './mail.mjs';
-import { writeRelativeFile, deleteRelativePath, copyRelativeFile } from './fs.mjs';
-import { queryTestDB, deleteInsertedItems } from './db.mjs';
+import { clearEmails, getMails, startMailServer } from './mail.mjs';
+import { copyRelativeFile, deleteRelativePath, writeRelativeFile } from './fs.mjs';
+import { deleteInsertedItems, queryTestDB } from './db.mjs';
 import { checkForLogs, clearLogs } from './logs.mjs';
+import setupA11yLog from './a11yLog.mjs';
 import { executeCli } from './cli.mjs';
 
 /**
@@ -26,4 +27,6 @@ export default function setupPlugins(on, config) {
     startMailServer: () => startMailServer(config),
     executeCli: (options) => executeCli(options, config),
   });
+
+  setupA11yLog(on, config);
 }
